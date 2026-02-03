@@ -137,6 +137,7 @@ def main():
             show_all_accounts()
         elif choice == "5":
             print("👋 Thank you for using the Bank A")
+          
 
 
 
