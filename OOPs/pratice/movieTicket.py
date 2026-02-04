@@ -1,31 +1,39 @@
-import random 
+import random
 
-#Movie List 
-movieList=["1. Avatar 2","2. Titanic","3. Avengers Endgame","4. Jurassic World","5. The Dark Knight"]
-#Create Seat Numbers
-rows=['A','B','C','D','E']
-seats={}
+# Movie List
+movieList = [
+    "Avatar 2",
+    "Titanic",
+    "Avengers Endgame",
+    "Jurassic World",
+    "The Dark Knight"
+]
+
+# Create Seat Numbers
+rows = ['A','B','C','D','E']
+seats = {}
+
 for r in rows:
     for n in range(1,11):
-        seat_name=r+str(n)
-        seats[seat_name]=False
-# Booking 
-bookings=[]
- # seat prise
-seat_prise={
+        seats[r+str(n)] = False
+
+# Seat prices
+seat_price = {
     "A":100,
     "B":200,
     "C":300,
-    "D":600,    
+    "D":600,
     "E":600
 }
 
+bookings = []
+
 class Movie:
-    def __init__(self,seat_no,movie_name,price,ticket_id):
-        self.seat_no=seat_no
-        self.movie_name=movie_name
-        self.price=price
-        self.ticket_id=ticket_id
+    def __init__(self, seat_no, movie_name, price, ticket_id):
+        self.seat_no = seat_no
+        self.movie_name = movie_name
+        self.price = price
+        self.ticket_id = ticket_id
 
     def show_ticket(self):
         print("\n🎟️ TICKET GENERATED")
@@ -34,96 +42,108 @@ class Movie:
         print(f"Movie Name : {self.movie_name}")
         print(f"Seat Number : {self.seat_no}")
         print(f"Price : ₹{self.price}")
-        print("--------------------------\n")
+        print("--------------------------")
 
-#generate Ticket ID
 def generate_ticket_id():
     return random.randint(1000000000, 9999999999)
-# show movie list
+
 def show_movies():
     print("\n🎬 Movie List:")
-    for i , movie in enumerate(movieList,1):
+    for i, movie in enumerate(movieList, 1):
         print(f"{i}. {movie}")
-#show movies anavilable
+
 def show_seats():
     print("\n🪑 Seats (X = Booked)\n")
     for r in rows:
         for n in range(1,11):
-            seat=f'{r}{n}'
-            if seats[seat]:
-                print(" X ",end="")
-            else :
-                print(f" {seat} ",end="")
-        print()  # New line after each row
+            seat = r + str(n)
+            print(" X " if seats[seat] else f" {seat} ", end="")
+        print()
 
-
-# seat prise
 def get_seat_price(seat):
-    row=seat[0]
-    return seat_prise[row]
-
-# now booking of ticket 
+    return seat_price[seat[0]]
 
 def book_ticket():
     show_movies()
-    choice=int(input("Enter Movie Number to Book Ticket : ")) - 1
+    choice = int(input("Enter Movie Number: ")) - 1
 
-    if choice not in range(movieList):
-        print("Invalid Movie Selection")
+    if choice not in range(len(movieList)):
+        print("❌ Invalid movie!")
         return
-    selected_movie=movieList[choice]
-    quaqntity=int(input("Enter Number of Tickets to Book : "))
-    totel=0
-    for _ in range(quaqntity):
-        seat_choice=input("Choose seat (A1, B5, E10): ").upper()
+
+    selected_movie = movieList[choice]
+    quantity = int(input("How many tickets? "))
+
+    total = 0
+
+    for _ in range(quantity):
+        show_seats()
+        seat_choice = input("Choose seat (A1,B5,E10): ").upper()
+
         if seat_choice not in seats:
-            print("Invalid Seat Selection")
+            print("Invalid seat!")
             continue
+
         if seats[seat_choice]:
-            print("Seat Already Booked")
+            print("Seat already booked!")
             continue
-        price=get_seat_price(seat_choice)
-        print(f"💰 Seat {seat_choice} price: ₹{price}")
-        seats[seat_choice]=True
-        totel += price
-        ticket_id=generate_ticket_id()
 
+        price = get_seat_price(seat_choice)
+        seats[seat_choice] = True
+        total += price
 
+        ticket_id = generate_ticket_id()
+        ticket = Movie(seat_choice, selected_movie, price, ticket_id)
+        bookings.append(ticket)
+        ticket.show_ticket()
 
+    print(f"\n🧾 TOTAL AMOUNT: ₹{total}")
 
+def show_bookings():
+    if not bookings:
+        print("\nNo tickets booked yet.")
+        return
+    for ticket in bookings:
+        ticket.show_ticket()
+
+def cancel_ticket():
+    tid = int(input("Enter Ticket ID to cancel: "))
+
+    for ticket in bookings:
+        if ticket.ticket_id == tid:
+            seats[ticket.seat_no] = False
+            bookings.remove(ticket)
+            print("❌ Ticket Cancelled!")
+            return
+
+    print("Ticket not found!")
 
 def main():
     while True:
-        print("\n=======Welcome To Ticket Booking======")
+        print("\n====== MOVIE TICKET BOOKING ======")
         print("1. Book Ticket")
         print("2. Cancel Ticket")
         print("3. Show Booking Details")
-        print("4. Seats Available")
+        print("4. Show Seats")
         print("5. Movie List")
         print("6. Exit")
 
-        num=int(input("Enter Your Choice : "))
-        match num:
-            case 1:
-                print("You selected 'Book Ticket'")
-                #function call
-            case 2:
-                print("Your Selected 'Cancel Ticket'")
-                #function call
-            case 3:
-                print("You Selected 'Show Booking Details'")
-                #function call          
-            case 4:
-                print("You Selected 'Seats Available'")
-                #function call
-            case 5:
-                print("You Selected 'Movie List'")
-                #function call
-            case 6:
-                print("Thank You for Visiting")
-                break
-            case _:
-                print("Invalid Option. Please try again.")
+        num = int(input("Enter Choice: "))
 
-
+        if num == 1:
+            book_ticket()
+        elif num == 2:
+            cancel_ticket()
+        elif num == 3:
+            show_bookings()
+        elif num == 4:
+            show_seats()
+        elif num == 5:
+            show_movies()
+        elif num == 6:
+            print("Thank you!")
+            break
+        else:
+            print("Invalid option!")
+            
 main()
